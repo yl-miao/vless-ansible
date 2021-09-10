@@ -1,0 +1,30 @@
+{
+  "inbounds": [
+    {
+      "port": {{ local_port }},
+      "listen":"127.0.0.1",//只监听 127.0.0.1，避免除本机外的机器探测到开放了 10000 端口
+      "protocol": "vless",
+      "settings": {
+        "clients": [
+          {
+            "id": "{{ uuid }}",
+            "alterId": 64
+          }
+        ],
+        "decryption": "none"
+      },
+      "streamSettings": {
+        "network": "ws",
+        "wsSettings": {
+        "path": "{{ path }}"
+        }
+      }
+    }
+  ],
+  "outbounds": [
+    {
+      "protocol": "freedom",
+      "settings": {}
+    }
+  ]
+}

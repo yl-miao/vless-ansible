@@ -1,0 +1,152 @@
+---
+# sudo apt update && sudo apt install -y xz-utils openssl gawk file
+# bash <(wget --no-check-certificate -qO- 'https://git.io/JeiRm') -d 10 -v 64 -a
+- name: enable bbr and update packages
+  hosts: v2servers
+  remote_user: root
+  gather_facts: no
+  tasks:
+    - name: set net.core.default_qdisc
+      sysctl:
+        name: net.core.default_qdisc
+        value: fq
+        state: present
+
+    - name: set net.ipv4.tcp_congestion_control
+      sysctl:
+        name: net.ipv4.tcp_congestion_control
+        value: bbr
+        state: present
+        reload: yes
+
+    - name: update packages
+      apt:
+        update_cache: yes
+        upgrade: yes
+
+    - name: check if a reboot is required
+      stat:
+        path: /var/run/reboot-required
+      register: reboot_required_file
+
+    - name: reboot if required
+      reboot:
+      when: reboot_required_file.stat.exists == true
+
+- name: install caddy v2
+  hosts: v2servers
+  remote_user: root
+  gather_facts: no
+  tasks:
+    - name: install appendencies and update other softwares
+      apt:
+        name:
+          - debian-keyring
+          - debian-archive-keyring
+          - apt-transport-https
+          - curl
+          - locate
+          - htop
+        state: latest
+
+    - name: update gpg key for caddy v2
+      shell: curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | tee /etc/apt/trusted.gpg.d/caddy-stable.asc
+
+    - name: update apt source for caddy v2
+      shell: curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | tee /etc/apt/sources.list.d/caddy-stable.list
+
+    - name: install caddy v2 with apt
+      apt:
+        name: caddy
+        state: latest
+        update_cache: yes
+
+- name: install fhs-v2ray
+  hosts: v2servers
+  remote_user: root
+  gather_facts: no
+  tasks:
+    - name: download fhs-v2ray script
+      get_url:
+        url: https://raw.githubusercontent.com/v2fly/fhs-install-v2ray/master/install-release.sh
+        dest: /tmp/install-release.sh
+        mode: 0755
+        force: yes
+
+    - name: install and/or update v2ray and .dat files
+      shell: /tmp/install-release.sh
+      args:
+        executable: /bin/bash
+
+- name: configure v2ray and caddy
+  hosts: v2servers
+  remote_user: root
+  gather_facts: no
+  vars:
+    uuid: your_uuid_here
+    path: /your_path_here
+    local_host: your_local_port_here
+  tasks:
+    - name: generate and copy Caddyfile using template
+      template:
+        src: Caddyfile.j2
+        dest: /etc/caddy/Caddyfile
+        mode: 0644
+
+    - name: generate and copy v2ray config file using template
+      template:
+        src: config.json.j2
+        dest: /usr/local/etc/v2ray/config.json
+        mode: 0644
+
+    - name: delete older version of pseudo site files if exist
+      file:
+        path: /var/www/pseudo
+        state: absent
+
+    - name: copy pseudo site files
+      copy:
+        src: pseudo/
+        dest: /var/www/pseudo
+        force: yes
+        mode: 0755
+
+    - name: restart and enable v2ray
+      systemd:
+        name: v2ray
+        state: restarted
+        enabled: yes
+
+    - name: restart and enable caddy
+      systemd:
+        name: caddy
+        state: restarted
+        enabled: yes
+
+- name: ensure that firewalls are disabled
+  hosts: v2servers
+  remote_user: root
+  gather_facts: no
+  tasks:
+    - name: ensure firewalld is stopped and disabled
+      systemd:
+        name: firewalld
+        state: stopped
+        enabled: yes
+      ignore_errors: yes
+
+    - name: ensure that iptables and/or ufw is disabled
+      shell: service iptables stop;chkconfig iptables off;ufw disable
+      ignore_errors: yes
+
+    - name: disable iptables at reboot
+      shell: iptables -P INPUT ACCEPT;
+        iptables -P FORWARD ACCEPT;
+        iptables -P OUTPUT ACCEPT;
+        iptables -F;
+        apt purge netfilter-persistent;
+        rm -rf /etc/iptables
+      ignore_errors: yes
+
+    - name: final reboot
+      reboot:
