@@ -1,7 +1,5 @@
 ---
-# wget --no-check-certificate -qO ~/Network-Reinstall-System-Modify.sh 'https://www.cxthhhhh.com/CXT-Library/Network-Reinstall-System-Modify/Network-Reinstall-System-Modify.sh' && chmod a+x ~/Network-Reinstall-System-Modify.sh
-# bash ~/Network-Reinstall-System-Modify.sh -Ubuntu_20.04
-# root cxthhhhh.com
+# bash <(wget --no-check-certificate -qO- 'https://raw.githubusercontent.com/MoeClub/Note/master/InstallNET.sh') -d 10 -v 64 -p "customize_root_password" -port "customize_ssh_port"
 
 - name: enable bbr and update packages
   hosts: v2servers
