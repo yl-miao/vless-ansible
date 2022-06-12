@@ -20,7 +20,7 @@ apt upgrade
 apt install python3
 ```
 
-### 3. sample ansible host file on the [host machine] (/etc/ansible/hosts):
+### 3. Sample ansible host file on the [host machine] (/etc/ansible/hosts):
 
 remember to configure the dns of example_vless1.example.com first.
 
