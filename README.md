@@ -48,11 +48,13 @@ uuid: your_uuid_here
 path: /your_path_here
 local_port: your_local_port_here
 ```
-
-remember to configure the firewall to block the local_port on the target machine. 
+(remember to configure the firewall to block the local_port on the target machine.)
 
 ### 6. Configure DNS, diable CDN, run the playbook on the [host machine], and turn on the CDN if you want.
 
-Then, you can connect using the address (example_vless1.example.com), port (443), uuid (configured in the playbook) and path (configured in the playbook) to connect to your vless server.
+Then, you can connect to your vless server using the address (example_vless1.example.com), port (443), uuid (configured in the playbook) and path (configured in the playbook).
 
 We use Caddy 2 as the web server, it will automatically renew TLS certificates.
+
+[Warning]
+Right now this only supports [target machines] of Debian/Ubuntu/Raspbian. Any firewall rules will be disabled on the [target machine] after performing this Ansible Playbook.
