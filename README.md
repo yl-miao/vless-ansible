@@ -4,10 +4,7 @@ Ansible Playbook for configuring VLESS+WebSocket+TLS+Web+(CDN)
 ### 1. reinstall a clean OS on the target machine before running the playbook if you need:
 
 ```bash
-wget --no-check-certificate -qO ~/Network-Reinstall-System-Modify.sh 'https://www.cxthhhhh.com/CXT-Library/Network-Reinstall-System-Modify/Network-Reinstall-System-Modify.sh' && chmod a+x ~/Network-Reinstall-System-Modify.sh
-bash ~/Network-Reinstall-System-Modify.sh -Ubuntu_20.04
-# default username: root
-# default password: cxthhhhh.com
+bash <(wget --no-check-certificate -qO- 'https://raw.githubusercontent.com/MoeClub/Note/master/InstallNET.sh') -d 10 -v 64 -p "自定义root密码" -port "自定义ssh端口"
 ```
 
 remember to change the password to a secure one.
@@ -17,7 +14,8 @@ remember to change the password to a secure one.
 ```bash
 apt update
 apt upgrade
-apt install python3 python-is-python3
+apt install python3 sshpass
+ssh example_vless1.example.com
 ```
 
 ### 3. sample ansible host file on the host machine (/etc/ansible/hosts):
@@ -33,7 +31,6 @@ example_vless2.example.com ansible_ssh_port=22 ansible_ssh_user='root' ansible_s
 ### 4. on the host machine, install sshpass, clone this project, choose some html template as the pseudo site and clone into the "pseudo" folder:
 
 ```bash
-apt install sshpass
 git clone https://github.com/yl-miao/vless-ansible.git
 cd vless-ansible
 git clone pseudo_site_project
