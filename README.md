@@ -37,7 +37,7 @@ git clone pseudo_site_project
 mv pseudo_site_project pseudo
 ```
 
-### 5. remember to configure the variables in the 90-92 lines of the playbook before running:
+### 5. remember to configure the variables in the 90-92 lines of the playbook (v2.yaml) before running:
 
 ```bash
 uuid: your_uuid_here
