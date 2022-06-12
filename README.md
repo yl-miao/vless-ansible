@@ -56,5 +56,6 @@ Then, you can connect to your vless server using the address (example_vless1.exa
 
 We use Caddy 2 as the web server, it will automatically renew TLS certificates.
 
-[Warning]
+[Warning]:
+
 Right now this only supports [target machines] of Debian/Ubuntu/Raspbian. Any firewall rules will be disabled on the [target machine] after performing this Ansible Playbook.
