@@ -1,5 +1,5 @@
 # vless-ansible
-Ansible Playbook for configuring VLESS+WebSocket+TLS+Web+(CDN)
+Ansible Playbook for configuring VLESS+WebSocket+TLS+Web+(CDN).
 
 ### 0. (OPTIONAL) Reinstall a clean OS on the [target machine] before running the playbook if you need:
 
