@@ -4,15 +4,18 @@ Ansible Playbook for configuring VLESS+WebSocket+TLS+Web+(CDN).
 ### 0. (OPTIONAL) Reinstall a clean OS on the [target machine] before running the playbook if you need:
 
 ```bash
-wget --no-check-certificate -qO InstallNET.sh 'https://moeclub.org/attachment/LinuxShell/InstallNET.sh' && chmod a+x InstallNET.sh
-# 安装 debian 12 64位  -p指定密码
-bash InstallNET.sh -d 12 -v 64 -a -p 123456 -port 22 --mirror 'http://mirrors.ustc.edu.cn/debian/'
+wget --no-check-certificate -O AutoReinstall.sh https://git.io/AutoReinstall.sh && bash AutoReinstall.sh
 ```
 
 ### 1. Install Ansible on the [host machine]:
 
 https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html
 
+Also, install rsync on the [host machine]:
+
+```bash
+sudo apt install rsync
+```
 
 ### 2. Make sure python is present on the [target machine]:
 
@@ -24,7 +27,7 @@ apt install python3
 
 ### 3. Sample ansible host file on the [host machine] (/etc/ansible/hosts):
 
-remember to configure the dns of example_vless1.example.com first.
+remember to configure the DNS of example_vless1.example.com first.
 
 ```bash
 [v2servers]
@@ -43,16 +46,20 @@ apt install sshpass
 ssh example_vless1.example.com
 ```
 
-### 5. Remember to configure the variables in the 90-92 lines of the playbook (v2.yaml) on the [host machine] before running:
+### 5. Remember to configure the variables in the 94-96 lines of the playbook (v2.yaml) on the [host machine] before running:
 
 ```bash
 uuid: your_uuid_here
 path: /your_path_here
 local_port: your_local_port_here
 ```
-(remember to configure the firewall to block the local_port on the target machine.)
+(remember to configure the firewall to block the local_port on the target machine. local_port should not be 443 since we have Caddy V2.)
 
 ### 6. Configure DNS, diable CDN, run the playbook on the [host machine], and turn on the CDN if you want.
+
+```bash
+ansible-playbook vless.yaml
+```
 
 Then, you can connect to your vless server using the address (example_vless1.example.com), port (443), uuid (configured in the playbook) and path (configured in the playbook).
 

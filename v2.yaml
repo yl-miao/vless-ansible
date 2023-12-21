@@ -48,16 +48,20 @@
           - curl
           - locate
           - htop
-          - fail2ban
+          - rsync
         state: latest
 
-    - name: update gpg key for caddy v2
-      shell: curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | sudo gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
-#      shell: curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+    - name: Check if Caddy GPG key is already present
+      stat:
+        path: /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+      register: caddy_gpg_key
+
+    - name: Update GPG key for Caddy v2
+      shell: curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+      when: not caddy_gpg_key.stat.exists
 
     - name: update apt source for caddy v2
-      shell: curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | sudo tee /etc/apt/sources.list.d/caddy-stable.list
-#      shell: curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | tee /etc/apt/sources.list.d/caddy-stable.list
+      shell: curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | tee /etc/apt/sources.list.d/caddy-stable.list
 
     - name: install caddy v2 with apt
       apt:
@@ -103,17 +107,13 @@
         dest: /usr/local/etc/v2ray/config.json
         mode: 0644
 
-    - name: delete older version of pseudo site files if exist
-      file:
-        path: /var/www/pseudo
-        state: absent
-
-    - name: copy pseudo site files
-      copy:
+    - name: Synchronize pseudo site files
+      synchronize:
         src: pseudo/
         dest: /var/www/pseudo
-        force: yes
-        mode: 0755
+        delete: yes
+        recursive: yes
+        mode: push
 
     - name: restart and enable v2ray
       systemd:
