@@ -49,6 +49,8 @@
           - locate
           - htop
           - rsync
+          - unzip
+          - tmux
         state: latest
 
     - name: Check if Caddy GPG key is already present
