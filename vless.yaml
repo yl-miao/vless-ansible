@@ -97,6 +97,16 @@
     path: /your_path_here
     local_port: your_local_port_here
   tasks:
+    - name: Check if Caddyfile exists and is not empty
+      stat:
+        path: /etc/caddy/Caddyfile
+      register: caddyfile_stat
+
+    - name: Fail if Caddyfile exists and is not empty
+      fail:
+        msg: "Caddyfile already exists and is not empty"
+      when: caddyfile_stat.stat.exists and caddyfile_stat.stat.size > 0
+
     - name: generate and copy Caddyfile using template
       template:
         src: Caddyfile.j2
